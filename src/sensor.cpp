@@ -44,9 +44,9 @@ void process_sensor()
             sensor_data.f_new_data = true;
             mqttPrintf(LOG_TOPIC, "Замеры успешны");
             Serial.println(F("Замеры успешны: "));
-            Serial.print(F("Humidity: "));
+            Serial.print(F("Влажность: "));
             Serial.print(sensor_data.humidity);
-            Serial.print(F("%  Temperature: "));
+            Serial.print(F("%  Температура: "));
             Serial.print(sensor_data.temperature);
             Serial.println(F("°C "));
         }

@@ -51,15 +51,15 @@ void main_process()
             int fan_pwm = minSpeed + (get_temperature() - TARGET_TEMPERATURE) * tempCoefficient +
                           (get_humidity() - TARGET_HUMIDITY) * humidityCoefficient;
 
-            if (fan_pwm < minSpeed)
+            if (fan_pwm <= minSpeed)
             {
                 fan_pwm = minSpeed;
-                relay_toggle(false);
+                relay_toggle(OFF);
             }
             else if (fan_pwm > maxSpeed)
                 fan_pwm = maxSpeed;
             else
-                relay_toggle(true);
+                relay_toggle(ON);
         }
 
         analogWrite(FAN_PIN, fan_pwm);
@@ -68,7 +68,13 @@ void main_process()
         Serial.print("Обороты вентилятора: ");
         Serial.println(fanSpeed);
         Serial.print("Состояние реле: ");
-        Serial.println(fanSpeed);
+        Serial.println(digitalRead(RELAY_PIN));
+        if(f_auto_mode){
+            Serial.println("Режим работы: автономный");
+            mqttPrintf(FAN_SPEED_TOPIC, "%d", fanSpeed);
+            }
+        else{
+            Serial.print("Режим работы: ручной");}
         mqttPrintf(FAN_SPEED_TOPIC, "%d", fanSpeed);
         mqttPrintf(TEMPERATURE_TOPIC, "%.1f", get_temperature());
         mqttPrintf(HUMIDITY_TOPIC, "%.1f", get_humidity());
@@ -80,9 +86,12 @@ void main_process()
 
 static void relay_toggle(bool state)
 {
+    if(digitalRead(RELAY_PIN)==state) 
+        return;
+    
     digitalWrite(RELAY_PIN, state);
     mqttPrintf(RELAY_TOPIC, "%d", digitalRead(RELAY_PIN));
-    Serial.print("Реле переключено: ");
+    Serial.print("Реле переключено, состояние: ");
     Serial.println(digitalRead(RELAY_PIN));
 }
 //-------------------------------------------------------------------------------
