@@ -48,7 +48,7 @@ void main_process()
     {
         if (f_auto_mode)
         {
-            int fan_pwm = minSpeed + (get_temperature() - TARGET_TEMPERATURE) * tempCoefficient +
+            fan_pwm = minSpeed + (get_temperature() - TARGET_TEMPERATURE) * tempCoefficient +
                           (get_humidity() - TARGET_HUMIDITY) * humidityCoefficient;
 
             if (fan_pwm <= minSpeed)
