@@ -10,7 +10,7 @@ static float humidityCoefficient = HUMIDITY_COEFFICIENT;
 static volatile unsigned long pulseCount = 0;
 static volatile int fanSpeed = 0;
 static volatile int fan_pwm = 0;
-static bool f_auto_mode = false;
+static bool f_auto_mode = true;
 //-------------------------------------------------------------------------------
 static void relay_toggle(bool state);
 //-------------------------------------------------------------------------------
