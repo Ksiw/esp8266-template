@@ -11,10 +11,10 @@ typedef struct
     bool f_new_data;
 } sensor_data_t;
 
-sensor_data_t sensor_data = {0, 0, false, 0, false};
-DHTesp dht;
+static sensor_data_t sensor_data = {0, 0, false, 0, false};
+static DHTesp dht;
 //-------------------------------------------------------------------------------
-void check_pause();
+static void check_pause();
 //-------------------------------------------------------------------------------
 
 void sensor_init()
@@ -65,7 +65,7 @@ bool get_new_data()
 }
 //-------------------------------------------------------------------------------
 
-void check_pause()
+static void check_pause()
 {
     if (millis() > sensor_data.pause_ms)
     {
