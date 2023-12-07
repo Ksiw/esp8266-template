@@ -31,9 +31,10 @@ static void onWiFiDisconnect(const WiFiEventStationModeDisconnected &event)
 
 void wifi_init()
 {
-  if (WiFi.status() != WL_CONNECTED)
-    if (millis() < next_connect_ms)
-      return;
+  if (WiFi.status() == WL_CONNECTED)
+    return;
+  if (millis() < next_connect_ms)
+    return;
 
   wifiConnectHandler = WiFi.onStationModeGotIP(onWiFiConnect);
   wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWiFiDisconnect);

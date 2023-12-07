@@ -57,7 +57,10 @@ void main_process()
                 relay_toggle(OFF);
             }
             else if (fan_pwm > maxSpeed)
+            {
                 fan_pwm = maxSpeed;
+                relay_toggle(ON);
+            }
             else
                 relay_toggle(ON);
         }
@@ -69,26 +72,29 @@ void main_process()
         Serial.println(fanSpeed);
         Serial.print("Состояние реле: ");
         Serial.println(digitalRead(RELAY_PIN));
-        if(f_auto_mode){
+        if (f_auto_mode)
+        {
             Serial.println("Режим работы: автономный");
             mqttPrintf(FAN_SPEED_TOPIC, "%d", fanSpeed);
-            }
-        else{
-            Serial.print("Режим работы: ручной");}
+        }
+        else
+        {
+            Serial.print("Режим работы: ручной");
+        }
         mqttPrintf(FAN_SPEED_TOPIC, "%d", fanSpeed);
         mqttPrintf(TEMPERATURE_TOPIC, "%.1f", get_temperature());
         mqttPrintf(HUMIDITY_TOPIC, "%.1f", get_humidity());
         mqttPrintf(RELAY_TOPIC, "%d", digitalRead(RELAY_PIN));
-        mqttPrintf(FAN_SPEED_TOPIC, "%d", fanSpeed);
+        mqttPrintf(FAN_PWM_TOPIC, "%d", fan_pwm);
     }
 }
 //-------------------------------------------------------------------------------
 
 static void relay_toggle(bool state)
 {
-    if(digitalRead(RELAY_PIN)==state) 
+    if (digitalRead(RELAY_PIN) == state)
         return;
-    
+
     digitalWrite(RELAY_PIN, state);
     mqttPrintf(RELAY_TOPIC, "%d", digitalRead(RELAY_PIN));
     Serial.print("Реле переключено, состояние: ");
@@ -97,7 +103,7 @@ static void relay_toggle(bool state)
 //-------------------------------------------------------------------------------
 
 void parce_incoming_command(char *topic, byte *payload, unsigned int length)
-{//используется в качестве коллбека при входящемм сообщении MQTT
+{ // используется в качестве коллбека при входящемм сообщении MQTT
     char command[length + 1];
     for (uint32_t i = 0; i < length; i++)
         command[i] = (char)payload[i];

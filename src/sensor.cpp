@@ -1,6 +1,9 @@
 #include "defines.h"
-#include "DHTesp.h"
+//#include "DHTesp.h"
 #include "mqtt.h"
+#include <Adafruit_Sensor.h>
+#include <DHT.h>
+//#include <DHT_U.h>
 
 typedef struct
 {
@@ -12,15 +15,18 @@ typedef struct
 } sensor_data_t;
 
 static sensor_data_t sensor_data = {0, 0, false, 0, false};
-static DHTesp dht;
+//static DHTesp dht;
+static DHT dht(DHT_PIN, DHT_TYPE);
+static sensor_t sensor;
 //-------------------------------------------------------------------------------
 static void check_pause();
 //-------------------------------------------------------------------------------
 
 void sensor_init()
 {
-    Serial.println(F("Датчик стартует..."));
-    dht.setup(DHT_PIN, DHTesp::DHT_TYPE);
+    Serial.println(F("DHT22 стартует!"));
+    dht.begin();
+    sensor_data.pause_ms = millis() + DHT_STABLE_MS;
 }
 //-------------------------------------------------------------------------------
 
@@ -32,8 +38,8 @@ void process_sensor()
         sensor_data.f_measure_ready = false;
         mqttPrintf(LOG_TOPIC, "Веду замеры...");
         Serial.println(F("Веду замеры..."));
-        sensor_data.humidity = dht.getHumidity();
-        sensor_data.temperature = dht.getTemperature();
+        sensor_data.humidity = dht.readHumidity();
+        sensor_data.temperature = dht.readTemperature();
         if (isnan(sensor_data.humidity) || isnan(sensor_data.temperature))
         {
             mqttPrintf(LOG_TOPIC, "Неудача при чтении датчика.");
