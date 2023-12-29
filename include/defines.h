@@ -12,7 +12,6 @@
 #define DEVICE_PREFIX                   "p58/hallway_fan/"
 #define DEVICE_PREFIX_DATA              DEVICE_PREFIX"data/"
 #define LOCAL_SERVER_IP                 "192.168.0.17"
-#define MDNS_NAME                       "TEMPLATE"
 #define UPDATE_USERNAME                 "user"
 #define UPDATE_PASS                     "pass"
 
