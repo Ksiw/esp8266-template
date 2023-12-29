@@ -1,5 +1,6 @@
 #pragma once
-#include <arduino.h>
+
+#include <Arduino.h>
 
 void main_init();
 void main_process();

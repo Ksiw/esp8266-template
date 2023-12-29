@@ -1,4 +1,5 @@
 #include "main_process.h"
+
 #include "defines.h"
 #include "sensor.h"
 #include "mqtt.h"
@@ -31,8 +32,11 @@ static void calculateSpeed()
 void main_init()
 {
     Serial.begin(SERIAL_BAUDRATE);
-    Serial.println();
-    Serial.println("Стартую!");
+    WRITE_INFO("\n", "\n", "\n", "-----------------------------------\n");
+    WRITE_INFO("Имя: ", DEVICE_NAME, "\n");
+    WRITE_INFO("Версия: ", VERSION, "\n");
+    WRITE_INFO("Стартую!\n");
+
     pinMode(RELAY_PIN, OUTPUT);
     pinMode(FAN_SPEED_PIN, INPUT_PULLDOWN_16);
     attachInterrupt(digitalPinToInterrupt(FAN_SPEED_PIN), countPulses, RISING); // прерывание на изменение состояния пина D7 на HIGH
@@ -49,7 +53,7 @@ void main_process()
         if (f_auto_mode)
         {
             fan_pwm = minSpeed + (get_temperature() - TARGET_TEMPERATURE) * tempCoefficient +
-                          (get_humidity() - TARGET_HUMIDITY) * humidityCoefficient;
+                      (get_humidity() - TARGET_HUMIDITY) * humidityCoefficient;
 
             if (fan_pwm <= minSpeed)
             {
@@ -66,21 +70,17 @@ void main_process()
         }
 
         analogWrite(FAN_PIN, fan_pwm);
-        Serial.print("ШИМ вентилятора: ");
-        Serial.println(fan_pwm);
-        Serial.print("Обороты вентилятора: ");
-        Serial.println(fanSpeed);
-        Serial.print("Состояние реле: ");
-        Serial.println(digitalRead(RELAY_PIN));
+        WRITE_INFO("Скважность ШИМ: ", fan_pwm, "\n");
+        WRITE_INFO("Обороты вентилятора: ", fanSpeed, "\n");
+        WRITE_INFO("Состояние реле: ", digitalRead(RELAY_PIN), "\n");
         if (f_auto_mode)
         {
-            Serial.println("Режим работы: автономный");
+            WRITE_INFO("Режим работы: автономный", "\n");
             mqttPrintf(FAN_SPEED_TOPIC, "%d", fanSpeed);
         }
         else
-        {
-            Serial.print("Режим работы: ручной");
-        }
+            WRITE_INFO("Режим работы: ручной", "\n");
+
         mqttPrintf(FAN_SPEED_TOPIC, "%d", fanSpeed);
         mqttPrintf(TEMPERATURE_TOPIC, "%.1f", get_temperature());
         mqttPrintf(HUMIDITY_TOPIC, "%.1f", get_humidity());
@@ -97,34 +97,40 @@ static void relay_toggle(bool state)
 
     digitalWrite(RELAY_PIN, state);
     mqttPrintf(RELAY_TOPIC, "%d", digitalRead(RELAY_PIN));
-    Serial.print("Реле переключено, состояние: ");
-    Serial.println(digitalRead(RELAY_PIN));
+    WRITE_INFO("Реле переключено, состояние: ", digitalRead(RELAY_PIN), "\n");
 }
 //-------------------------------------------------------------------------------
 
 void parce_incoming_command(char *topic, byte *payload, unsigned int length)
-{ // используется в качестве коллбека при входящемм сообщении MQTT
+{ // используется в качестве коллбека при входящем сообщении MQTT
     char command[length + 1];
     for (uint32_t i = 0; i < length; i++)
         command[i] = (char)payload[i];
-
     command[length] = '\0';
 
-    if (strcmp(command, "on") == 0)
+    if (strcmp(command, COMAND_RELAY_ON) == 0)
         relay_toggle(true);
-    else if (strcmp(command, "off") == 0)
+    else if (strcmp(command, COMAND_RELAY_OFF) == 0)
         relay_toggle(false);
-    else if (strcmp(command, "auto") == 0)
+    else if (strcmp(command, COMAND_SET_MODE_AUTO) == 0)
         f_auto_mode = true;
-    else if (strcmp(command, "manual") == 0)
+    else if (strcmp(command, COMAND_SET_MODE_MANUAL) == 0)
         f_auto_mode = false;
-    else if (strcmp(command, "PWM ") == 0)
+    else if (strncmp(command, COMAND_SET_PWM, sizeof(COMAND_SET_PWM) - 1) == 0)
     {
         // начиная с индекса 4 - идет число(0-255) для вентилятора
-        fan_pwm = atoi(&command[4]);
+        fan_pwm = atoi(&command[sizeof(COMAND_SET_PWM) - 1]);
+        WRITE_INFO(COMAND_SET_PWM, ": ", fan_pwm, "\n");
         analogWrite(FAN_PIN, fan_pwm);
     }
+    else if (strncmp(command, COMAND_SET_TEMPERATURE_DELTA, sizeof(COMAND_SET_TEMPERATURE_DELTA) - 1) == 0)
+    {
+        float d = atof(&command[sizeof(COMAND_SET_TEMPERATURE_DELTA) - 1]);
+        WRITE_INFO(COMAND_SET_TEMPERATURE_DELTA, " = ", d, "\n");
+        set_temperature_delta(d);
+    }
     mqttPrintf(LOG_TOPIC, "%s", command);
+    WRITE_INFO(String("Команда: ") + command + "\n");
 }
 
 //-------------------------------------------------------------------------------

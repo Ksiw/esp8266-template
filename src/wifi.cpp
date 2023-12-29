@@ -1,5 +1,8 @@
 #include <ESP8266WiFi.h>
 #include "defines.h"
+#include "wifi.h"
+
+#define CHECK_CONNECT_MS 100
 
 static const char *ssid = WIFI_SSID;
 static const char *password = WIFI_PASSWORD;
@@ -8,24 +11,26 @@ static WiFiEventHandler wifiConnectHandler;
 static WiFiEventHandler wifiDisconnectHandler;
 
 static uint32_t next_connect_ms = 0;
-static bool f_first_connect = true;
+static bool f_init = true;
+static bool f_start_connect = false;
 //-------------------------------------------------------------------------------
 
 static void onWiFiConnect(const WiFiEventStationModeGotIP &event)
 {
-  Serial.println("Wi-Fi соединение установлено.");
-  Serial.print("IP адрес: ");
-  Serial.println(WiFi.localIP());
-  Serial.print("RSSI: ");
-  Serial.println(WiFi.RSSI());
+  f_start_connect = false;
+  WRITE_INFO("Wi-Fi соединение установлено.", "\n");
+  WRITE_INFO("MAC адрес: ", WiFi.macAddress(), "\n");
+  WRITE_INFO("SSID: ", WiFi.SSID(), "\n");
+  WRITE_INFO("IP адрес: ", WiFi.localIP().toString().c_str(), "\n");
+  WRITE_INFO("RSSI: ", WiFi.RSSI(), "\n");
 }
 
 //-------------------------------------------------------------------------------
 static void onWiFiDisconnect(const WiFiEventStationModeDisconnected &event)
 {
-  Serial.println("Wi-Fi соединение потеряно, пытаемся переподключиться...");
+  WRITE_INFO("Wi-Fi соединение потеряно.", "\n");
   WiFi.disconnect();
-  WiFi.begin(ssid, password);
+  wifi_init();
 }
 //-------------------------------------------------------------------------------
 
@@ -36,20 +41,28 @@ void wifi_init()
   if (millis() < next_connect_ms)
     return;
 
-  wifiConnectHandler = WiFi.onStationModeGotIP(onWiFiConnect);
-  wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWiFiDisconnect);
+  if (f_init == true)
+  {
+    f_init = false;
+    wifiConnectHandler = WiFi.onStationModeGotIP(onWiFiConnect);
+    wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWiFiDisconnect);
+    WiFi.mode(WIFI_STA);
+  }
 
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  next_connect_ms = millis() + WIFI_CONNECT_TIMEOUT;
-  Serial.println("Попытка подключиться к WiFi...");
-  if (WiFi.status() == WL_CONNECTED)
-    f_first_connect = false;
+  if (f_start_connect == false)
+  {
+    f_start_connect = true;
+    next_connect_ms = millis() + WIFI_CONNECT_TIMEOUT;
+    WRITE_INFO("Попытка подключиться к WiFi...", "\n");
+    WiFi.begin(ssid, password);
+    return;
+  }
+  
   else
   {
-    next_connect_ms = millis() + WIFI_CONNECT_TIMEOUT;
-    Serial.print("Wi-Fi соединение не установлено. Код ошибки: ");
-    Serial.println(WiFi.status());
+    f_start_connect = false;
+    WRITE_INFO("Wi-Fi соединение не установлено. Код ошибки: ", WiFi.status(), "\n");
+    WRITE_INFO("Попытка снова через ", next_connect_ms / 1000, " секунд", "\n");
   }
 }
 //-------------------------------------------------------------------------------

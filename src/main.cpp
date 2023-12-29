@@ -13,25 +13,39 @@
 #include "display.h"
 #include "wifi.h"
 #include "mqtt.h"
+#include "ntp.h"
 #include "main_process.h"
+#include "gpio.h"
+#include "firmware_update.h"
 //-------------------------------------------------------------------------------
 
 void setup()
 {
+  #ifndef DEBUG_MODE
+  wdt_enable(WATCHDOG_TIMEOUT);
+  #endif
+  gpio_init();
   main_init();
   sensor_init();
   display_init();
   wifi_init();
+  ntp_init();
   mqtt_init();
+  firmware_update_init();
+
 }
 //-------------------------------------------------------------------------------
 
 void loop()
 {
+  wdt_reset();
+  gpio_process();
   process_sensor();
   display_process();
   wifi_process();
   mqtt_process();
   main_process();
+  ntp_process();
+  firmware_update_process();
 }
 //-------------------------------------------------------------------------------
