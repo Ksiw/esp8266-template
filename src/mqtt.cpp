@@ -35,7 +35,7 @@ static void mqttConnect()
                          { parce_incoming_command(topic, payload, length); });
       client.subscribe(COMAND_TOPIC);
       mqttPrintf(MQTT_TOPIC_MY_IP, "%s", WiFi.localIP().toString().c_str());
-      mqttPrintf(INFO_TOPIC, "%s ВЕРСИЯ %s", DEVICE_NAME, VERSION);
+      mqttPrintf(INFO_TOPIC, "%s, ВЕРСИЯ %s", DEVICE_NAME, VERSION);
     }
     else
       WRITE_INFO("Не подключено. Код ошибки: ", client.state(), "\n");
@@ -76,7 +76,7 @@ void mqttPrintf(const char *topic, const char *format, ...)
 {
   if (client.connected())
   {
-    char buffer[256] = {0};
+    char buffer[128] = {0};
     va_list args;
     va_start(args, format);
     vsnprintf(buffer, sizeof(buffer), format, args);

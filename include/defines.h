@@ -2,44 +2,34 @@
 
 //Common
 #define SERIAL_INFO                     true
-#define VERSION                         "0.1.0"
+#define VERSION                         "0.1.3"
 #define DEVICE_NAME                     "TEMPLATE"
 #define SERIAL_BAUDRATE                 115200
 #define TARGET_TEMPERATURE              29
 #define TARGET_HUMIDITY                 50
 #define ON                              1
 #define OFF                             0
-#define DEVICE_PREFIX                   "p58/hallway_fan/"
-#define DEVICE_PREFIX_DATA              DEVICE_PREFIX"data/"
+#define DEVICE_PREFIX                   "p58/template/"
 #define LOCAL_SERVER_IP                 "192.168.0.17"
-#define UPDATE_USERNAME                 "user"
-#define UPDATE_PASS                     "pass"
 
 //wifi
-#define WIFI_SSID                       "SSID"
-#define WIFI_PASSWORD                   "pass"
-#define WIFI_CONNECT_TIMEOUT            15000
+#define WIFI_SSID                       ""
+#define WIFI_PASSWORD                   ""
+#define WIFI_CONNECT_TIMEOUT            20000
 
 //mqtt
 #define MQTT_SERVER                     LOCAL_SERVER_IP
 #define MQTT_PORT                       1883
-#define LOG_MESS_SIZE                   64
 #define MQTT_ID                         "mqtt_21223" //дата
-#define MQTT_USER                       "user"
-#define MQTT_PASS                       "pass"
-#define MQTT_TOPIC_MY_IP                DEVICE_PREFIX"my_ip"
+#define MQTT_USER                       "template"
+#define MQTT_PASS                       ""
 #define MQTT_RECONNECT_TIMEOUT          10000
-#define MAX_QUEUE_SIZE                  20
-
-//sensor
-#define DHT_PIN                         D4
-#define DHT_TYPE                        DHT22
-#define DHT_STABLE_MS                   2000
-#define DHT_READ_PERIOD                 15000
-#define TEMPERAURE_DELTA                -2.5f
-#define INFO_TOPIC                      DEVICE_PREFIX"info"
-#define LOG_TOPIC                       DEVICE_PREFIX"log"
+#define DEVICE_PREFIX_DATA              DEVICE_PREFIX"data/"
+#define DEVICE_PREFIX_INFO              DEVICE_PREFIX"info/"
 #define COMAND_TOPIC                    DEVICE_PREFIX"comand"
+#define MQTT_TOPIC_MY_IP                DEVICE_PREFIX_INFO"my_ip"
+#define INFO_TOPIC                      DEVICE_PREFIX_INFO"info"
+#define LOG_TOPIC                       DEVICE_PREFIX_INFO"log"
 #define TIME_TOPIC                      DEVICE_PREFIX_DATA"time"
 #define NOISE_TOPIC                     DEVICE_PREFIX_DATA"noise"
 #define HUMIDITY_TOPIC                  DEVICE_PREFIX_DATA"humidity"
@@ -47,6 +37,13 @@
 #define FAN_SPEED_TOPIC                 DEVICE_PREFIX_DATA"fan_speed"
 #define RELAY_TOPIC                     DEVICE_PREFIX_DATA"relay"
 #define FAN_PWM_TOPIC                   DEVICE_PREFIX_DATA"fan_pwm"
+
+//sensor
+#define DHT_PIN                         D4
+#define DHT_TYPE                        DHT22
+#define DHT_STABLE_MS                   2000
+#define DHT_READ_PERIOD                 15000
+#define TEMPERAURE_DELTA                -2.5f
 
 //load
 #define RELAY_PIN                       D5 //на плате D1, перепаяй!
@@ -78,20 +75,19 @@
 #define WATCHDOG_TIMEOUT                10000
 
 //ota
-#define OTA_USER                        "user"
-#define OTA_PASSWORD                    "pass"
+#define OTA_USER                        ""
+#define OTA_PASSWORD                    ""
 #define OTA_PORT                        80
-#define OTA_PATH                        "/update"
+#define OTA_PATH                        "/"    
 
 //comands
+#define COMAND_RESTART                  "restart"
 #define COMAND_RELAY_ON                 "on"
 #define COMAND_RELAY_OFF                "off"
 #define COMAND_SET_MODE_AUTO            "auto"
 #define COMAND_SET_MODE_MANUAL          "manual"
 #define COMAND_SET_PWM                  "PWM"
-#define COMAND_SET_TEMPERATURE_DELTA    "delta"
-
- 
+#define COMAND_SET_TEMPERATURE_DELTA    "delta" 
 
 //macros
 //example    WRITE_INFO("Версия: ", VERSION, "\n");

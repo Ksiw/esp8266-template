@@ -108,7 +108,9 @@ void parce_incoming_command(char *topic, byte *payload, unsigned int length)
         command[i] = (char)payload[i];
     command[length] = '\0';
 
-    if (strcmp(command, COMAND_RELAY_ON) == 0)
+    if (strcmp(command, COMAND_RESTART) == 0)
+        ESP.restart();
+    else if (strcmp(command, COMAND_RELAY_ON) == 0)
         relay_toggle(true);
     else if (strcmp(command, COMAND_RELAY_OFF) == 0)
         relay_toggle(false);
