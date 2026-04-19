@@ -52,7 +52,7 @@
 #define FAN_SPEED_MIN                   0
 #define TEMPERATURE_COEFFICIENT         1.1
 #define HUMIDITY_COEFFICIENT            1.7
-#define FAN_SPEED_PIN                   D0
+#define FAN_SPEED_PIN                   D7
 
 //lcd
 #define LCD_WIDTH                       64

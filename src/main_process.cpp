@@ -22,7 +22,7 @@ static void IRAM_ATTR countPulses()
 }
 //-------------------------------------------------------------------------------
 
-static void calculateSpeed()
+static void IRAM_ATTR calculateSpeed()
 {
     fanSpeed = pulseCount;
     pulseCount = 0;
@@ -38,8 +38,8 @@ void main_init()
     WRITE_INFO("Стартую!\n");
 
     pinMode(RELAY_PIN, OUTPUT);
-    pinMode(FAN_SPEED_PIN, INPUT_PULLDOWN_16);
-    attachInterrupt(digitalPinToInterrupt(FAN_SPEED_PIN), countPulses, RISING); // прерывание на изменение состояния пина D7 на HIGH
+    pinMode(FAN_SPEED_PIN, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(FAN_SPEED_PIN), countPulses, FALLING); // тахометр вентилятора обычно open-collector
     timer1_enable(TIM_DIV256, TIM_EDGE, TIM_LOOP);                              // настройка таймера 1 с предделителем 256 и режимом прерывания на каждый фронт
     timer1_attachInterrupt(calculateSpeed);
     timer1_write(1000000); // установка периода таймера на 1 секунду
@@ -81,7 +81,6 @@ void main_process()
         else
             WRITE_INFO("Режим работы: ручной", "\n");
 
-        mqttPrintf(FAN_SPEED_TOPIC, "%d", fanSpeed);
         mqttPrintf(TEMPERATURE_TOPIC, "%.1f", get_temperature());
         mqttPrintf(HUMIDITY_TOPIC, "%.1f", get_humidity());
         mqttPrintf(RELAY_TOPIC, "%d", digitalRead(RELAY_PIN));
@@ -103,6 +102,7 @@ static void relay_toggle(bool state)
 
 void parce_incoming_command(char *topic, byte *payload, unsigned int length)
 { // используется в качестве коллбека при входящем сообщении MQTT
+    (void)topic;
     char command[length + 1];
     for (uint32_t i = 0; i < length; i++)
         command[i] = (char)payload[i];

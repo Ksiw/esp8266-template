@@ -28,6 +28,10 @@ void display_init()
 {
     display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
     d.f_noise = true;
+    d.noise_ms = millis() + LCD_NOISE_MS;
+    d.f_show_temperature = false;
+    d.f_show_humidity = false;
+    d.f_show_started = false;
     display.setTextSize(2);
 }
 //-------------------------------------------------------------------------------
