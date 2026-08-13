@@ -1,0 +1,5 @@
+{
+  "name": "hardware_timer",
+  "version": "1.0.0",
+  "description": "ESP8266 Timer1 wrapper"
+}

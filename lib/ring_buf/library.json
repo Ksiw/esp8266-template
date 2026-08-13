@@ -1,0 +1,5 @@
+{
+  "name": "ring_buf",
+  "version": "1.0.0",
+  "description": "Reusable fixed-size ring buffer for Arduino projects"
+}

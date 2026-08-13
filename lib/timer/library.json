@@ -1,0 +1,5 @@
+{
+  "name": "timer",
+  "version": "1.0.0",
+  "description": "Simple rollover-safe timer for Arduino projects"
+}
